@@ -1,0 +1,16 @@
+---
+title: "Dashboards"
+author: "Rafaella Monsalve"
+
+output: 
+  html_document:
+    toc: true
+
+      
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
