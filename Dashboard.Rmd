@@ -9,21 +9,28 @@ output:
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
-library(tidyverse)
-library(purrr)
 library(dplyr)
 library(lubridate)
 library(ggplot2)
 library(tm)
 library(wordcloud)
 library(readr)
-library(readxl)
+library(treemap)
+library(treemapify)
 library(highcharter)
+library(tidyverse)
 library(leaflet)
+library(tidyverse)
 library(sf)
+library(readxl)
+library(dplyr)
+library(purrr)
+library(RColorBrewer)
+library(crosstalk)
+library(DT)
 ```
 
-# Iniciativas Violencia Doméstica {data-icon=fa-ruler}
+# Iniciativas Violencia Doméstica {data-icon=fa-gavel}
 ##
 ### Población en Estudio
 ```{r}
@@ -153,7 +160,7 @@ hchart(dato3, "treemap", hcaes(x = clave, value = valor
                                , color = valor))
 ```
 
-# Iniciativas Ciberbullying {data-icon=fa-ruler}
+# Iniciativas Ciberbullying {data-icon=fa-gavel}
 ##
 ### Población en Estudio
 ```{r}
@@ -227,4 +234,317 @@ hchart(dato3_cb, "treemap", hcaes(x = clave, value = valor
                                , color = valor))
 ```
 
+# Tendencias VD (WEB) {data-icon=fa-wifi}
+##
+### Mapa {data-width=2} 
+```{r}
+shp_bid <- read_sf("bidgeo.shp")
+base <- readRDS("base_obs.rds")%>%
+        select(geo,vweb_vd20)%>%
+        mutate(vweb_vd20=ifelse(vweb_vd20!=-1,vweb_vd20,0),
+               vweb_vd20=round(vweb_vd20,digits = 0))
+       
+       # Unir BBDD + SHP ---------------------------------------------------------
+       base_shp=shp_bid%>%
+               left_join(base,by="geo")
+              
+       # Cartografía mapa base ---------------------------------------------------
+       mapa_base <- leaflet(base_shp) %>%
+               addTiles() %>%
+               addProviderTiles(providers$Esri.WorldImagery, 
+                                group = "Satelite")%>%
+               setView(lng=-75, lat=-12 , zoom=2.4)
+       
+       # Paleta de colores y labels ----------------------------------------------
+       #Población Mujeres
+       
+       pal_vd  <- colorNumeric(palette = "RdPu",
+                              domain = base_shp$vweb_vd20,
+                              na.color = "transparent")
+       
+       labels_vd <- sprintf("<strong>%s</strong><br/>%s %g<strong>%s</strong>",
+                           base_shp$nom_pais,
+                           "Hits:",
+                           base_shp$vweb_vd20,"") %>% 
+               lapply(htmltools::HTML)
+       
+       mapa_base%>% 
+               addPolygons(fillColor = ~pal_vd(vweb_vd20),
+                           weight = 2,
+                           opacity = 1,
+                           color = "white",
+                           dashArray = "3",
+                           fillOpacity = 0.7,
+                           highlight = highlightOptions(
+                                   weight = 3,
+                                   color = "#bfbfbf",
+                                   dashArray = "",
+                                   fillOpacity = 0.7,
+                                   bringToFront = TRUE),
+                           label = labels_vd,
+                           labelOptions = labelOptions(
+                                   style = list("font-weight" = "normal", padding = "3px 8px"),
+                                   textsize = "10px",
+                                   direction = "auto"),
+                           group = "Violencia Doméstica")%>% 
+               addLegend(pal = pal_vd, values = ~vweb_vd20, opacity = 0.7, 
+                         title = "Hits", position = "topright",
+                         group = "Violencia Doméstica")%>%
+               addLayersControl(
+                       baseGroups = c("Satellite"),
+                       overlayGroups = c("Violencia Doméstica"),
+                       position = "topleft",
+                       options = layersControlOptions(collapsed = TRUE))
+
+
+```
+
+##
+### Topicos de Interes  
+```{r}
+topics_tbl2 = readRDS("topics_tbl20.rds")%>%
+        mutate(keyword=ifelse(keyword=="Cyberbullying","Ciberbullying",keyword))%>%
+        arrange(interest)%>%
+        filter(keyword=="Violencia Doméstica")%>%
+        distinct()%>%
+        arrange(desc(interest))%>% 
+        ungroup() %>% 
+        mutate(value=str_to_sentence(value),
+                topicos= as_factor(value) %>%  fct_reorder(interest),
+               color=as.character("#ff33af"))
+
+hchart(topics_tbl2, "bar", hcaes(x = topicos, y = interest, color = color,name = interest),polar=FALSE)
+```
+
+### Interes en el tiempo {data-width=2} 
+```{r}
+interest_tbl=readRDS("interest_tbl20.rds")
+interest_tbl2 <-interest_tbl %>% 
+                filter(keyword %in% c("Violencia Doméstica"))%>%
+                mutate(year = year(date),
+                       month = month(date,label = TRUE,
+                                     abbr = TRUE), 
+                       day = day(date),
+                       date2=make_date(year = year,month = month, day = day))%>%
+                select(date2,hits,year,month,day)%>%
+                mutate(color=as.character("#ff85cf"),
+                       date=date2)
+        
+        media=interest_tbl2%>%
+                group_by(month)%>%
+                mutate(mean=round(median(hits),digits = 1))%>%
+                filter(day==1)%>%
+                distinct()%>%
+                mutate(color=as.character("#800080"),
+                       date=date2)
+                
+        
+        
+        
+       hc = hchart(interest_tbl2 ,"point", 
+                   hcaes(x=date, y=hits, name= hits,color = color),
+                   name = "Hits",id = "hits",
+                   showInLegend = FALSE)%>%
+               hc_tooltip(headerFormat = "{ }",
+       pointFormat = '{point.x: %d %b,%Y} =
+               Hits {point.y:f} ')%>% 
+               hc_colors(interest_tbl2$color)
+       hc%>%
+               hc_add_series(media, 'spline', hcaes(x=date, y=mean),
+                              name = "media",
+                              id = "media",
+                              lineWidth = 5,
+                              showInLegend = TRUE) %>%
+                hc_yAxis(
+               title = list(text = "Hits"),
+               opposite = FALSE,
+               max= 100
+       )%>%
+               hc_colors(media$color)
+```
+
+##
+### Publicaciones Academicas
+```{r}
+acade <- readRDS("base_obs.rds")%>%
+        select(geo,vac_vd20)
+base_sac=shp_bid%>%
+               left_join(acade,by="geo")
+acade =st_drop_geometry(base_sac)
+
+hchart(acade, "treemap", hcaes(x = nom_pais, value = vac_vd20
+                               , color = vac_vd20))
+```
+
+### Word Cloud
+```{r}
+pala_vd=readRDS("palabras_vd.rds")%>%
+        filter(word!="violence against women act 2019")%>%
+        filter(word!="violence against women act")%>%
+        filter(word!="violence")%>%
+        filter(word!="woman")%>%
+        filter(word!="female")
+
+
+wordcloud(words = pala_vd$word, freq = pala_vd$n, min.freq = 60,
+          max.words=60, random.order=TRUE, rot.per=0.1, 
+          colors=brewer.pal(8, "Dark2"))
+           
+```
+
+# Tendencias CB (WEB) {data-icon=fa-wifi}
+##
+### Mapa  
+```{r}
+shp_bid <- read_sf("bidgeo.shp")
+base <- readRDS("base_obs.rds")%>%
+        select(geo,vweb_cb20)%>%
+        mutate(vweb_cb20=ifelse(vweb_cb20!=-1,vweb_cb20,0),
+               vweb_cb20=round(vweb_cb20,digits = 0))
+       
+       # Unir BBDD + SHP ---------------------------------------------------------
+       base_shp=shp_bid%>%
+               left_join(base,by="geo")
+              
+       # Cartografía mapa base ---------------------------------------------------
+       mapa_base <- leaflet(base_shp) %>%
+               addTiles() %>%
+               addProviderTiles(providers$Esri.WorldImagery, 
+                                group = "Satelite")%>%
+               setView(lng=-75, lat=-12 , zoom=2.4)
+       
+       # Paleta de colores y labels ----------------------------------------------
+       #Población Mujeres
+       
+       pal_cb  <- colorNumeric(palette = "YlGnBu",
+                              domain = base_shp$vweb_cb20,
+                              na.color = "transparent")
+       
+       labels_cb <- sprintf("<strong>%s</strong><br/>%s %g<strong>%s</strong>",
+                           base_shp$nom_pais,
+                           "Hits:",
+                           base_shp$vweb_cb20,"") %>% 
+               lapply(htmltools::HTML)
+       
+       mapa_base%>% 
+               addPolygons(fillColor = ~pal_cb(vweb_cb20),
+                           weight = 2,
+                           opacity = 1,
+                           color = "white",
+                           dashArray = "3",
+                           fillOpacity = 0.7,
+                           highlight = highlightOptions(
+                                   weight = 3,
+                                   color = "#bfbfbf",
+                                   dashArray = "",
+                                   fillOpacity = 0.7,
+                                   bringToFront = TRUE),
+                           label = labels_cb,
+                           labelOptions = labelOptions(
+                                   style = list("font-weight" = "normal", padding = "3px 8px"),
+                                   textsize = "10px",
+                                   direction = "auto"),
+                           group = "Ciberbulying")%>% 
+               addLegend(pal = pal_cb, values = ~vweb_cb20, opacity = 0.7, 
+                         title = "Hits", position = "topright",
+                         group = "Ciberbulying")%>%
+               addLayersControl(
+                       baseGroups = c("Satellite"),
+                       overlayGroups = c("Ciberbulying"),
+                       position = "topleft",
+                       options = layersControlOptions(collapsed = TRUE))
+
+
+```
+
+##
+### Topicos de Interes  
+```{r}
+topics_tbl3 = readRDS("topics_tbl20.rds")%>%
+        mutate(keyword=ifelse(keyword=="Cyberbullying","Ciberbullying",keyword))%>%
+        arrange(interest)%>%
+        filter(keyword=="Ciberbullying")%>%
+        distinct()%>%
+        arrange(desc(interest))%>% 
+        ungroup() %>% 
+        mutate(value=str_to_sentence(value),
+                topicos= as_factor(value) %>%  fct_reorder(interest),
+               color=as.character("#009c8c"))
+
+hchart(topics_tbl3, "bar", hcaes(x = topicos, y = interest, color = color,name = interest),polar=FALSE)
+```
+
+### Interes en el tiempo  
+```{r}
+interest_tbl=readRDS("interest_tbl20.rds")
+interest_tbl4 <-interest_tbl %>% 
+                filter(keyword %in% c("Cyberbullying"))%>%
+                mutate(year = year(date),
+                       month = month(date,label = TRUE,
+                                     abbr = TRUE), 
+                       day = day(date),
+                       date2=make_date(year = year,month = month, day = day))%>%
+                select(date2,hits,year,month,day)%>%
+                mutate(color=as.character("#8cf6fa"),
+                       date=date2)
+        
+        media2=interest_tbl4%>%
+                group_by(month)%>%
+                mutate(mean=round(median(hits),digits = 1))%>%
+                filter(day==1)%>%
+                distinct()%>%
+                mutate(color=as.character("#009c8c"),
+                       date=date2)
+                
+        
+        
+        
+       hc = hchart(interest_tbl4 ,"point", 
+                   hcaes(x=date, y=hits, name= hits,color = color),
+                   name = "Hits",id = "hits",
+                   showInLegend = FALSE)%>%
+               hc_tooltip(headerFormat = "{ }",
+       pointFormat = '{point.x: %d %b,%Y} =
+               Hits {point.y:f} ')%>% 
+               hc_colors(interest_tbl4$color)
+       hc%>%
+               hc_add_series(media2, 'spline', hcaes(x=date, y=mean),
+                              name = "media",
+                              id = "media",
+                              lineWidth = 5,
+                              showInLegend = TRUE) %>%
+               hc_yAxis(
+               title = list(text = "Hits"),
+               opposite = FALSE,
+               max= 100
+       )%>%
+               hc_colors(media2$color)
+```
+
+##
+### Publicaciones Academicas
+```{r}
+acade_cb <- readRDS("base_obs.rds")%>%
+        select(geo,vac_cb20)
+base_sac=shp_bid%>%
+               left_join(acade_cb,by="geo")
+acade_cb =st_drop_geometry(base_sac)
+
+hchart(acade_cb, "treemap", hcaes(x = nom_pais, value = vac_cb20
+                               , color = vac_cb20))
+```
+
+### Word Cloud
+```{r}
+pala_cb=readRDS("palabras_cb.rds")%>%
+        filter(word!="cyberbullying")%>%
+        filter(word!="violence")
+        
+
+
+wordcloud(words = pala_cb$word, freq = pala_cb$n, min.freq = 60,
+          max.words=60, random.order=TRUE, rot.per=0.1, 
+          colors=brewer.pal(8, "Dark2"))
+           
+```
 
