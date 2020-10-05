@@ -28,6 +28,7 @@ library(purrr)
 library(RColorBrewer)
 library(crosstalk)
 library(DT)
+library(kableExtra)
 ```
 
 # Iniciativas Violencia Doméstica {data-icon=fa-gavel}
@@ -145,7 +146,7 @@ names(dato2)=c("Tipo","valor")
 hchart(dato2, "column", hcaes(x = Tipo, y = valor, color = Tipo, name = valor))
 ```
 
-##
+##{.tabset .tabset-fade}
 ### Finalidad de las Iniciativas Encontradas
 ```{r}
 dato3=dato_vd%>% 
@@ -159,6 +160,18 @@ dato3=dato_vd%>%
 hchart(dato3, "treemap", hcaes(x = clave, value = valor
                                , color = valor))
 ```
+
+### Data 
+```{r}
+stats=read_csv("data/Ini_cb.csv")
+names(stats)
+names(stats)=c("Fecha","País","Nombre de Iniciativa", "Tipo de Iniciativa", "Descripción","Link")
+stats %>%
+  DT::datatable( options = list(scrollX = TRUE, scrollY = TRUE))
+
+
+```
+
 
 # Iniciativas Ciberbullying {data-icon=fa-gavel}
 ##
@@ -222,7 +235,7 @@ hchart(dato2_cb, "column", hcaes(x = Tipo, y = valor, color = Tipo, name = valor
 ##
 ### Finalidad de las Iniciativas Encontradas
 ```{r}
-dato3_cb=dato_vd%>% 
+dato3_cb=dato_cb%>% 
         gather(clave,valor,-`Área`)%>%
         select(clave,valor)%>%
         filter(clave!="Planes y Programas"&

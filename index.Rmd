@@ -2,8 +2,11 @@
 title: "Dashboard"
 output: 
   flexdashboard::flex_dashboard:
+    theme: cosmo
     orientation: columns
     vertical_layout: fill
+ 
+
   
 ---
 
@@ -28,11 +31,15 @@ library(purrr)
 library(RColorBrewer)
 library(crosstalk)
 library(DT)
+library(kableExtra)
 ```
 
 # Iniciativas Violencia Doméstica {data-icon=fa-gavel}
-##
-### Población en Estudio
+
+
+## {.tabset .tabset-fade}
+
+### Población en estudio
 ```{r}
 # Bases de datos ----------------------------------------------------------
 shp_bid <- read_sf("bidgeo.shp")
@@ -111,8 +118,45 @@ mapa_base%>%
 
 ```
 
+
+### Data 
+```{r}
+stats=read_csv("data/data_mapa_vd.csv")
+names(stats)=c("Código","País","Proporción de mujeres", "Proporción de niños", "Fuente")
+stats %>%
+  DT::datatable(escape = FALSE,
+    filter = "top", 
+    extensions = c(
+      "Buttons",  
+      "Scroller"  
+    ),
+    rownames = FALSE,  
+    style = "bootstrap",
+    class = "compact",
+    width = "100%",
+    options = list(
+      dom = "Blrtip",  
+      deferRender = TRUE,
+      scrollY = 300,
+      scroller = TRUE,
+      columnDefs = list(
+        list(
+          visible = FALSE,
+          targets = c(3,3, 4:4)
+        )
+      ), 
+      buttons = list(
+        I("colvis"),  
+        "csv" 
+        
+      )))
+
+
+```
+
+
 ##
-### Iniciativas encontradas {data-width=2} 
+### Iniciativas encontradas  {data-height=200}
 ```{r dataset}
 dato <- read.csv2("prueba1.csv",encoding = "UTF-8")
 names(dato)=c("Área","Iniciativas","Planes y Programas",
@@ -131,7 +175,9 @@ valueBox(formattable::comma(dato_vd$Iniciativas,digits=0),
          icon = "fa-eye",color = "#8c004b")
 ```
 
-### Tipos de Iniciativas encontradas {data-width=4} 
+
+
+### Tipos de iniciativas encontradas {data-height=800}
 ```{r}
 dato2=dato_vd%>% 
         gather(clave,valor,-`Área`)%>%
@@ -145,8 +191,47 @@ names(dato2)=c("Tipo","valor")
 hchart(dato2, "column", hcaes(x = Tipo, y = valor, color = Tipo, name = valor))
 ```
 
-##
-### Finalidad de las Iniciativas Encontradas
+
+<!-- ### Data  -->
+<!-- ```{r} -->
+<!-- stats=read_csv("data/Tipo_Ini_vd.csv") -->
+<!-- names(stats)=c("Tipo de Iniciativa","Fecha","País", "Nombre de iniciativa", "Institución") -->
+<!-- stats %>% -->
+<!--   DT::datatable(escape = FALSE, -->
+<!--     filter = "top",  -->
+<!--     extensions = c( -->
+<!--       "Buttons",   -->
+<!--       "Scroller"   -->
+<!--     ), -->
+<!--     rownames = FALSE,   -->
+<!--     style = "bootstrap", -->
+<!--     class = "compact", -->
+<!--     width = "100%", -->
+<!--     options = list( -->
+<!--       dom = "Blrtip",   -->
+<!--       deferRender = TRUE, -->
+<!--       scrollY = 300, -->
+<!--       scroller = TRUE, -->
+<!--       columnDefs = list( -->
+<!--         list( -->
+<!--           visible = FALSE, -->
+<!--           targets = c(3,3, 3:4) -->
+<!--         ) -->
+<!--       ),  -->
+<!--       buttons = list( -->
+<!--         I("colvis"),   -->
+<!--         "csv"  -->
+
+<!--       ))) -->
+
+
+<!-- ``` -->
+
+
+
+## {.tabset .tabset-fade}
+
+### Finalidad de las iniciativas encontradas 
 ```{r}
 dato3=dato_vd%>% 
         gather(clave,valor,-`Área`)%>%
@@ -160,9 +245,47 @@ hchart(dato3, "treemap", hcaes(x = clave, value = valor
                                , color = valor))
 ```
 
+### Data 
+```{r}
+stats=read_csv("data/Ini_vd.csv")
+stats$Link <- paste0("<a href='",stats$link,"'>",stats$link,"</a>")
+stats$link <- NULL
+names(stats)=c("Fecha","País","Nombre de Iniciativa", "Tipo de Iniciativa", "Descripción","Link")
+stats %>%
+  DT::datatable(escape = FALSE,
+    filter = "top", 
+    extensions = c(
+      "Buttons",  
+      "Scroller"  
+    ),
+    rownames = FALSE,  
+    style = "bootstrap",
+    class = "compact",
+    width = "100%",
+    options = list(
+      dom = "Blrtip",  
+      deferRender = TRUE,
+      scrollY = 300,
+      scroller = TRUE,
+      columnDefs = list(
+        list(
+          visible = FALSE,
+          targets = c(2,3, 4:5)
+        )
+      ), 
+      buttons = list(
+        I("colvis"),  
+        "csv" 
+        
+      )))
+
+
+```
+
+
 # Iniciativas Ciberbullying {data-icon=fa-gavel}
 ##
-### Población en Estudio
+### Población en estudio
 ```{r}
 
 # Mapa de población niños ---------------------------------------
@@ -205,7 +328,7 @@ valueBox(formattable::comma(dato_cb$Iniciativas,digits=0),
          icon = "fa-eye",color = "#009c8c")
 ```
 
-### Tipos de Iniciativas encontradas {data-width=4} 
+### Tipos de iniciativas encontradas {data-width=4} 
 ```{r}
 dato2_cb=dato_cb%>% 
         gather(clave,valor,-`Área`)%>%
@@ -220,9 +343,9 @@ hchart(dato2_cb, "column", hcaes(x = Tipo, y = valor, color = Tipo, name = valor
 ```
 
 ##
-### Finalidad de las Iniciativas Encontradas
+### Finalidad de las iniciativas encontradas
 ```{r}
-dato3_cb=dato_vd%>% 
+dato3_cb=dato_cb%>% 
         gather(clave,valor,-`Área`)%>%
         select(clave,valor)%>%
         filter(clave!="Planes y Programas"&
@@ -300,7 +423,7 @@ base <- readRDS("base_obs.rds")%>%
 ```
 
 ##
-### Topicos de Interes  
+### Tópicos de interés  
 ```{r}
 topics_tbl2 = readRDS("topics_tbl20.rds")%>%
         mutate(keyword=ifelse(keyword=="Cyberbullying","Ciberbullying",keyword))%>%
@@ -316,7 +439,7 @@ topics_tbl2 = readRDS("topics_tbl20.rds")%>%
 hchart(topics_tbl2, "bar", hcaes(x = topicos, y = interest, color = color,name = interest),polar=FALSE)
 ```
 
-### Interes en el tiempo {data-width=2} 
+### Interés en el tiempo {data-width=2} 
 ```{r}
 interest_tbl=readRDS("interest_tbl20.rds")
 interest_tbl2 <-interest_tbl %>% 
@@ -364,7 +487,7 @@ interest_tbl2 <-interest_tbl %>%
 ```
 
 ##
-### Publicaciones Academicas
+### Publicaciones académicas
 ```{r}
 acade <- readRDS("base_obs.rds")%>%
         select(geo,vac_vd20)
@@ -458,7 +581,7 @@ base <- readRDS("base_obs.rds")%>%
 ```
 
 ##
-### Topicos de Interes  
+### Tópicos de interés  
 ```{r}
 topics_tbl3 = readRDS("topics_tbl20.rds")%>%
         mutate(keyword=ifelse(keyword=="Cyberbullying","Ciberbullying",keyword))%>%
@@ -474,7 +597,7 @@ topics_tbl3 = readRDS("topics_tbl20.rds")%>%
 hchart(topics_tbl3, "bar", hcaes(x = topicos, y = interest, color = color,name = interest),polar=FALSE)
 ```
 
-### Interes en el tiempo  
+### Interés en el tiempo  
 ```{r}
 interest_tbl=readRDS("interest_tbl20.rds")
 interest_tbl4 <-interest_tbl %>% 
@@ -522,7 +645,7 @@ interest_tbl4 <-interest_tbl %>%
 ```
 
 ##
-### Publicaciones Academicas
+### Publicaciones académicas
 ```{r}
 acade_cb <- readRDS("base_obs.rds")%>%
         select(geo,vac_cb20)
