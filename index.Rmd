@@ -32,6 +32,7 @@ library(RColorBrewer)
 library(crosstalk)
 library(DT)
 library(kableExtra)
+library(readr)
 ```
 
 # Iniciativas Violencia Doméstica {data-icon=fa-gavel}
@@ -47,43 +48,36 @@ base <- readRDS("base_obs.rds")%>%
         select(geo,PM20,PN20)%>%
         mutate(PM20=ifelse(PM20!=-1,PM20,NA),
                PN20=ifelse(PN20!=-1,PN20,NA))
-
 # Unir BBDD + SHP ---------------------------------------------------------
 base_shp=shp_bid%>%
         left_join(base,by="geo")%>%
         mutate(PM20=round(PM20,1),
                PN20=round(PN20,1))
-
 # Cartografía mapa base ---------------------------------------------------
 mapa_base <- leaflet(base_shp) %>%
         addTiles() %>%
         addProviderTiles(providers$Esri.WorldImagery, 
                          group = "Satelite")%>%
         setView(lng=-75, lat=-12 , zoom=2.4)
-
 # Paleta de colores y labels ----------------------------------------------
 #Población Mujeres
 bins_m <- c(49.00, 50.50, 53.00, 54.50)
 pal_m  <- colorBin("RdPu", domain = base_shp$PM20, 
                    bins = bins_m, na.color ="#999999")
-
 labels_m <- sprintf("<strong>%s</strong><br/>%s %g<strong>%s</strong>",
                     base_shp$nom_pais,
                     "Pobl. Femenina:",
                     base_shp$PM20,"%") %>% 
         lapply(htmltools::HTML)
-
 #Población Niños
 bins_n <- c(18.00, 23.00, 28.00, 33.00)
 pal_n  <- colorBin("GnBu", domain = base_shp$PN20, 
                    bins = bins_n, na.color ="#999999")
-
 labels_n <- sprintf("<strong>%s</strong><br/>%s %g<strong>%s</strong>",
                     base_shp$nom_pais,
                     "Pobl. Niños:",
                     base_shp$PN20,"%") %>% 
         lapply(htmltools::HTML)
-
 ```
 
 ```{r}
@@ -115,14 +109,14 @@ mapa_base%>%
                 overlayGroups = c("Pobl. Mujeres"),
                 position = "topleft",
                 options = layersControlOptions(collapsed = TRUE))
-
 ```
 
 
 ### Data 
 ```{r}
-stats=read_csv("data/data_mapa_vd.csv")
-names(stats)=c("Código","País","Proporción de mujeres", "Proporción de niños", "Fuente")
+stats=read_csv("data/data_mapa.csv")
+stats$PN20 <- NULL
+names(stats)=c("Código","País","Proporción de mujeres", "Fuente")
 stats %>%
   DT::datatable(escape = FALSE,
     filter = "top", 
@@ -142,7 +136,7 @@ stats %>%
       columnDefs = list(
         list(
           visible = FALSE,
-          targets = c(3,3, 4:4)
+          targets = c(3,3, 3:3)
         )
       ), 
       buttons = list(
@@ -150,8 +144,6 @@ stats %>%
         "csv" 
         
       )))
-
-
 ```
 
 
@@ -187,7 +179,6 @@ dato2=dato_vd%>%
                        clave=="Productos y/o Recursos"|
                        clave=="Proyectos y/o Iniciativas")
 names(dato2)=c("Tipo","valor")
-
 hchart(dato2, "column", hcaes(x = Tipo, y = valor, color = Tipo, name = valor))
 ```
 
@@ -278,13 +269,12 @@ stats %>%
         "csv" 
         
       )))
-
-
 ```
 
-
 # Iniciativas Ciberbullying {data-icon=fa-gavel}
-##
+
+## {.tabset .tabset-fade}
+
 ### Población en estudio
 ```{r}
 
@@ -319,6 +309,42 @@ mapa_base%>%
 
 ```
 
+### Data 
+```{r}
+stats=read_csv("data/data_mapa.csv")
+stats$PM20 <- NULL
+names(stats)=c("Código","País","Proporción de Niños", "Fuente")
+stats %>%
+  DT::datatable(escape = FALSE,
+    filter = "top", 
+    extensions = c(
+      "Buttons",  
+      "Scroller"  
+    ),
+    rownames = FALSE,  
+    style = "bootstrap",
+    class = "compact",
+    width = "100%",
+    options = list(
+      dom = "Blrtip",  
+      deferRender = TRUE,
+      scrollY = 300,
+      scroller = TRUE,
+      columnDefs = list(
+        list(
+          visible = FALSE,
+          targets = c(3,3, 3:3)
+        )
+      ), 
+      buttons = list(
+        I("colvis"),  
+        "csv" 
+        
+      )))
+
+
+```
+
 ##
 ### Iniciativas encontradas {data-width=2} 
 ```{r}
@@ -342,7 +368,7 @@ names(dato2_cb)=c("Tipo","valor")
 hchart(dato2_cb, "column", hcaes(x = Tipo, y = valor, color = Tipo, name = valor))
 ```
 
-##
+## {.tabset .tabset-fade}
 ### Finalidad de las iniciativas encontradas
 ```{r}
 dato3_cb=dato_cb%>% 
@@ -356,6 +382,44 @@ dato3_cb=dato_cb%>%
 hchart(dato3_cb, "treemap", hcaes(x = clave, value = valor
                                , color = valor))
 ```
+
+### Data 
+```{r}
+stats=read_csv("data/Ini_cb.csv")
+stats$Link <- paste0("<a href='",stats$link,"'>",stats$link,"</a>")
+stats$link <- NULL
+names(stats)=c("Fecha","País","Nombre de Iniciativa", "Tipo de Iniciativa", "Descripción","Link")
+stats %>%
+  DT::datatable(escape = FALSE,
+    filter = "top", 
+    extensions = c(
+      "Buttons",  
+      "Scroller"  
+    ),
+    rownames = FALSE,  
+    style = "bootstrap",
+    class = "compact",
+    width = "100%",
+    options = list(
+      dom = "Blrtip",  
+      deferRender = TRUE,
+      scrollY = 300,
+      scroller = TRUE,
+      columnDefs = list(
+        list(
+          visible = FALSE,
+          targets = c(2,3, 4:5)
+        )
+      ), 
+      buttons = list(
+        I("colvis"),  
+        "csv" 
+        
+      )))
+
+
+```
+
 
 # Tendencias VD (WEB) {data-icon=fa-wifi}
 ##
