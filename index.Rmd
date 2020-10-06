@@ -368,6 +368,42 @@ names(dato2_cb)=c("Tipo","valor")
 hchart(dato2_cb, "column", hcaes(x = Tipo, y = valor, color = Tipo, name = valor))
 ```
 
+<!-- ### Data  -->
+<!-- ```{r} -->
+<!-- stats=read_csv("data/Tipo_Ini_cd.csv") -->
+<!-- names(stats)=c("Tipo de Iniciativa","Fecha","País", "Nombre de iniciativa", "Institución") -->
+<!-- stats %>% -->
+<!--   DT::datatable(escape = FALSE, -->
+<!--     filter = "top",  -->
+<!--     extensions = c( -->
+<!--       "Buttons",   -->
+<!--       "Scroller"   -->
+<!--     ), -->
+<!--     rownames = FALSE,   -->
+<!--     style = "bootstrap", -->
+<!--     class = "compact", -->
+<!--     width = "100%", -->
+<!--     options = list( -->
+<!--       dom = "Blrtip",   -->
+<!--       deferRender = TRUE, -->
+<!--       scrollY = 300, -->
+<!--       scroller = TRUE, -->
+<!--       columnDefs = list( -->
+<!--         list( -->
+<!--           visible = FALSE, -->
+<!--           targets = c(3,3, 3:4) -->
+<!--         ) -->
+<!--       ),  -->
+<!--       buttons = list( -->
+<!--         I("colvis"),   -->
+<!--         "csv"  -->
+
+<!--       ))) -->
+
+
+<!-- ``` -->
+
+
 ## {.tabset .tabset-fade}
 ### Finalidad de las iniciativas encontradas
 ```{r}
@@ -422,8 +458,9 @@ stats %>%
 
 
 # Tendencias VD (WEB) {data-icon=fa-wifi}
-##
-### Mapa {data-width=2} 
+
+## {.tabset .tabset-fade}
+### Mapa  
 ```{r}
 shp_bid <- read_sf("bidgeo.shp")
 base <- readRDS("base_obs.rds")%>%
@@ -486,6 +523,42 @@ base <- readRDS("base_obs.rds")%>%
 
 ```
 
+### Data
+```{r}
+stats=read_csv("data/data_mapa_trend_vd.csv")
+names(stats)=c("Código País","País","Hits", "Fuente")
+stats %>%
+  DT::datatable(escape = FALSE,
+    filter = "top",
+    extensions = c(
+      "Buttons",
+      "Scroller"
+    ),
+    rownames = FALSE,
+    style = "bootstrap",
+    class = "compact",
+    width = "100%",
+    options = list(
+      dom = "Blrtip",
+      deferRender = TRUE,
+      scrollY = 300,
+      scroller = TRUE,
+      columnDefs = list(
+        list(
+          visible = FALSE,
+          targets = c(3,3, 3:3)
+        )
+      ),
+      buttons = list(
+        I("colvis"),
+        "csv"
+
+      )))
+
+
+```
+
+
 ##
 ### Tópicos de interés  
 ```{r}
@@ -503,7 +576,45 @@ topics_tbl2 = readRDS("topics_tbl20.rds")%>%
 hchart(topics_tbl2, "bar", hcaes(x = topicos, y = interest, color = color,name = interest),polar=FALSE)
 ```
 
-### Interés en el tiempo {data-width=2} 
+
+<!-- ### Data -->
+<!-- ```{r} -->
+<!-- stats=read_csv("data/topics_tbl2.csv") -->
+<!-- names(stats)=c("Tópicos","Interés","Fuente") -->
+<!-- stats %>% -->
+<!--   DT::datatable(escape = FALSE, -->
+<!--     filter = "top", -->
+<!--     extensions = c( -->
+<!--       "Buttons", -->
+<!--       "Scroller" -->
+<!--     ), -->
+<!--     rownames = FALSE, -->
+<!--     style = "bootstrap", -->
+<!--     class = "compact", -->
+<!--     width = "100%", -->
+<!--     options = list( -->
+<!--       dom = "Blrtip", -->
+<!--       deferRender = TRUE, -->
+<!--       scrollY = 300, -->
+<!--       scroller = TRUE, -->
+<!--       columnDefs = list( -->
+<!--         list( -->
+<!--           visible = FALSE, -->
+<!--           targets = c(2,2, 2:2) -->
+<!--         ) -->
+<!--       ), -->
+<!--       buttons = list( -->
+<!--         I("colvis"), -->
+<!--         "csv" -->
+
+<!--       ))) -->
+
+
+<!-- ``` -->
+
+
+
+### Interés en el tiempo  
 ```{r}
 interest_tbl=readRDS("interest_tbl20.rds")
 interest_tbl2 <-interest_tbl %>% 
@@ -550,8 +661,44 @@ interest_tbl2 <-interest_tbl %>%
                hc_colors(media$color)
 ```
 
+
+<!-- ### Data -->
+<!-- ```{r} -->
+<!-- stats=read_csv("data/interest_tbl2.csv") -->
+<!-- names(stats)=c("Fecha","Hits","Año", "Mes", "Día", "Fuente") -->
+<!-- stats %>% -->
+<!--   DT::datatable(escape = FALSE, -->
+<!--     filter = "top", -->
+<!--     extensions = c( -->
+<!--       "Buttons", -->
+<!--       "Scroller" -->
+<!--     ), -->
+<!--     rownames = FALSE, -->
+<!--     style = "bootstrap", -->
+<!--     class = "compact", -->
+<!--     width = "100%", -->
+<!--     options = list( -->
+<!--       dom = "Blrtip", -->
+<!--       deferRender = TRUE, -->
+<!--       scrollY = 300, -->
+<!--       scroller = TRUE, -->
+<!--       columnDefs = list( -->
+<!--         list( -->
+<!--           visible = FALSE, -->
+<!--           targets = c(3,3, 3:5) -->
+<!--         ) -->
+<!--       ), -->
+<!--       buttons = list( -->
+<!--         I("colvis"), -->
+<!--         "csv" -->
+
+<!--       ))) -->
+
+
+<!-- ``` -->
+
 ##
-### Publicaciones académicas
+### Publicaciones académicas 
 ```{r}
 acade <- readRDS("base_obs.rds")%>%
         select(geo,vac_vd20)
@@ -562,6 +709,44 @@ acade =st_drop_geometry(base_sac)
 hchart(acade, "treemap", hcaes(x = nom_pais, value = vac_vd20
                                , color = vac_vd20))
 ```
+
+<!-- ### Data -->
+<!-- ```{r} -->
+<!-- stats=read_delim("data/acade.csv", ";",  -->
+<!--     escape_double = FALSE, trim_ws = TRUE) -->
+<!-- names(stats)=c("Código País","País","Cantidad Publicaciones", "Fuente") -->
+<!-- stats %>% -->
+<!--   DT::datatable(escape = FALSE, -->
+<!--     filter = "top", -->
+<!--     extensions = c( -->
+<!--       "Buttons", -->
+<!--       "Scroller" -->
+<!--     ), -->
+<!--     rownames = FALSE, -->
+<!--     style = "bootstrap", -->
+<!--     class = "compact", -->
+<!--     width = "100%", -->
+<!--     options = list( -->
+<!--       dom = "Blrtip", -->
+<!--       deferRender = TRUE, -->
+<!--       scrollY = 300, -->
+<!--       scroller = TRUE, -->
+<!--       columnDefs = list( -->
+<!--         list( -->
+<!--           visible = FALSE, -->
+<!--           targets = c(3,3, 3:3) -->
+<!--         ) -->
+<!--       ), -->
+<!--       buttons = list( -->
+<!--         I("colvis"), -->
+<!--         "csv" -->
+
+<!--       ))) -->
+
+
+<!-- ``` -->
+
+
 
 ### Word Cloud
 ```{r}
@@ -579,8 +764,45 @@ wordcloud(words = pala_vd$word, freq = pala_vd$n, min.freq = 60,
            
 ```
 
+<!-- ### Data -->
+<!-- ```{r} -->
+<!-- stats=read_csv("data/pala_vd.csv") -->
+<!-- names(stats)=c("Palabra","Cantidad", "Fuente") -->
+<!-- stats %>% -->
+<!--   DT::datatable(escape = FALSE, -->
+<!--     filter = "top", -->
+<!--     extensions = c( -->
+<!--       "Buttons", -->
+<!--       "Scroller" -->
+<!--     ), -->
+<!--     rownames = FALSE, -->
+<!--     style = "bootstrap", -->
+<!--     class = "compact", -->
+<!--     width = "100%", -->
+<!--     options = list( -->
+<!--       dom = "Blrtip", -->
+<!--       deferRender = TRUE, -->
+<!--       scrollY = 300, -->
+<!--       scroller = TRUE, -->
+<!--       columnDefs = list( -->
+<!--         list( -->
+<!--           visible = FALSE, -->
+<!--           targets = c(2,2, 2:2) -->
+<!--         ) -->
+<!--       ), -->
+<!--       buttons = list( -->
+<!--         I("colvis"), -->
+<!--         "csv" -->
+
+<!--       ))) -->
+
+
+<!-- ``` -->
+
+
+
 # Tendencias CB (WEB) {data-icon=fa-wifi}
-##
+## {.tabset .tabset-fade}
 ### Mapa  
 ```{r}
 shp_bid <- read_sf("bidgeo.shp")
@@ -644,6 +866,43 @@ base <- readRDS("base_obs.rds")%>%
 
 ```
 
+### Data
+```{r}
+stats=read_csv("data/data_mapa_trend_cb.csv")
+names(stats)=c("Código País","País","Hits", "Fuente")
+stats %>%
+  DT::datatable(escape = FALSE,
+    filter = "top",
+    extensions = c(
+      "Buttons",
+      "Scroller"
+    ),
+    rownames = FALSE,
+    style = "bootstrap",
+    class = "compact",
+    width = "100%",
+    options = list(
+      dom = "Blrtip",
+      deferRender = TRUE,
+      scrollY = 300,
+      scroller = TRUE,
+      columnDefs = list(
+        list(
+          visible = FALSE,
+          targets = c(3,3, 3:3)
+        )
+      ),
+      buttons = list(
+        I("colvis"),
+        "csv"
+
+      )))
+
+
+```
+
+
+
 ##
 ### Tópicos de interés  
 ```{r}
@@ -660,6 +919,46 @@ topics_tbl3 = readRDS("topics_tbl20.rds")%>%
 
 hchart(topics_tbl3, "bar", hcaes(x = topicos, y = interest, color = color,name = interest),polar=FALSE)
 ```
+
+
+<!-- ### Data -->
+<!-- ```{r} -->
+<!-- stats=read_csv("data/topics_tbl3.csv") -->
+<!-- names(stats)=c("Tópicos","Interés","Fuente") -->
+<!-- stats %>% -->
+<!--   DT::datatable(escape = FALSE, -->
+<!--     filter = "top", -->
+<!--     extensions = c( -->
+<!--       "Buttons", -->
+<!--       "Scroller" -->
+<!--     ), -->
+<!--     rownames = FALSE, -->
+<!--     style = "bootstrap", -->
+<!--     class = "compact", -->
+<!--     width = "100%", -->
+<!--     options = list( -->
+<!--       dom = "Blrtip", -->
+<!--       deferRender = TRUE, -->
+<!--       scrollY = 300, -->
+<!--       scroller = TRUE, -->
+<!--       columnDefs = list( -->
+<!--         list( -->
+<!--           visible = FALSE, -->
+<!--           targets = c(2,2, 2:2) -->
+<!--         ) -->
+<!--       ), -->
+<!--       buttons = list( -->
+<!--         I("colvis"), -->
+<!--         "csv" -->
+
+<!--       ))) -->
+
+
+<!-- ``` -->
+
+
+
+
 
 ### Interés en el tiempo  
 ```{r}
@@ -708,6 +1007,42 @@ interest_tbl4 <-interest_tbl %>%
                hc_colors(media2$color)
 ```
 
+<!-- ### Data -->
+<!-- ```{r} -->
+<!-- stats=read_csv("data/interest_tbl2.csv") -->
+<!-- names(stats)=c("Fecha","Hits","Año", "Mes", "Día", "Fuente") -->
+<!-- stats %>% -->
+<!--   DT::datatable(escape = FALSE, -->
+<!--     filter = "top", -->
+<!--     extensions = c( -->
+<!--       "Buttons", -->
+<!--       "Scroller" -->
+<!--     ), -->
+<!--     rownames = FALSE, -->
+<!--     style = "bootstrap", -->
+<!--     class = "compact", -->
+<!--     width = "100%", -->
+<!--     options = list( -->
+<!--       dom = "Blrtip", -->
+<!--       deferRender = TRUE, -->
+<!--       scrollY = 300, -->
+<!--       scroller = TRUE, -->
+<!--       columnDefs = list( -->
+<!--         list( -->
+<!--           visible = FALSE, -->
+<!--           targets = c(3,3, 3:5) -->
+<!--         ) -->
+<!--       ), -->
+<!--       buttons = list( -->
+<!--         I("colvis"), -->
+<!--         "csv" -->
+
+<!--       ))) -->
+
+
+<!-- ``` -->
+
+
 ##
 ### Publicaciones académicas
 ```{r}
@@ -720,6 +1055,43 @@ acade_cb =st_drop_geometry(base_sac)
 hchart(acade_cb, "treemap", hcaes(x = nom_pais, value = vac_cb20
                                , color = vac_cb20))
 ```
+
+<!-- ### Data -->
+<!-- ```{r} -->
+<!-- stats=read_delim("data/acade_cb.csv", ";", -->
+<!--     escape_double = FALSE, trim_ws = TRUE) -->
+<!-- names(stats)=c("Código País","País","Cantidad Publicaciones", "Fuente") -->
+<!-- stats %>% -->
+<!--   DT::datatable(escape = FALSE, -->
+<!--     filter = "top", -->
+<!--     extensions = c( -->
+<!--       "Buttons", -->
+<!--       "Scroller" -->
+<!--     ), -->
+<!--     rownames = FALSE, -->
+<!--     style = "bootstrap", -->
+<!--     class = "compact", -->
+<!--     width = "100%", -->
+<!--     options = list( -->
+<!--       dom = "Blrtip", -->
+<!--       deferRender = TRUE, -->
+<!--       scrollY = 300, -->
+<!--       scroller = TRUE, -->
+<!--       columnDefs = list( -->
+<!--         list( -->
+<!--           visible = FALSE, -->
+<!--           targets = c(3,3, 3:3) -->
+<!--         ) -->
+<!--       ), -->
+<!--       buttons = list( -->
+<!--         I("colvis"), -->
+<!--         "csv" -->
+
+<!--       ))) -->
+
+
+<!-- ``` -->
+
 
 ### Word Cloud
 ```{r}
@@ -734,4 +1106,41 @@ wordcloud(words = pala_cb$word, freq = pala_cb$n, min.freq = 60,
           colors=brewer.pal(8, "Dark2"))
            
 ```
+
+
+<!-- ### Data -->
+<!-- ```{r} -->
+<!-- stats=read_delim("data/pala_cb.csv",  -->
+<!--     ";", escape_double = FALSE, trim_ws = TRUE) -->
+<!-- names(stats)=c("Palabra","Cantidad", "Fuente") -->
+<!-- stats %>% -->
+<!--   DT::datatable(escape = FALSE, -->
+<!--     filter = "top", -->
+<!--     extensions = c( -->
+<!--       "Buttons", -->
+<!--       "Scroller" -->
+<!--     ), -->
+<!--     rownames = FALSE, -->
+<!--     style = "bootstrap", -->
+<!--     class = "compact", -->
+<!--     width = "100%", -->
+<!--     options = list( -->
+<!--       dom = "Blrtip", -->
+<!--       deferRender = TRUE, -->
+<!--       scrollY = 300, -->
+<!--       scroller = TRUE, -->
+<!--       columnDefs = list( -->
+<!--         list( -->
+<!--           visible = FALSE, -->
+<!--           targets = c(2,2, 2:2) -->
+<!--         ) -->
+<!--       ), -->
+<!--       buttons = list( -->
+<!--         I("colvis"), -->
+<!--         "csv" -->
+
+<!--       ))) -->
+
+
+<!-- ``` -->
 
