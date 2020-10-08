@@ -555,33 +555,35 @@ base <- readRDS("base_obs.rds")%>%
 ### Data
 ```{r}
 stats=read_csv("data/data_mapa_trend_vd.csv")
-names(stats)=c("Código País","País","Hits", "Fuente")
+stats$geo <- NULL
+names(stats)=c("País","Hits", "Fuente")
 stats %>%
   DT::datatable(escape = FALSE,
-    filter = "top",
+    filter = "top", 
     extensions = c(
       "Buttons",
-      "Scroller"
+      "Scroller"  
     ),
-    rownames = FALSE,
+    rownames = FALSE,  
     style = "bootstrap",
     class = "compact",
     width = "100%",
     options = list(
-      dom = "Blrtip",
+      dom = "Blrtip",  
       deferRender = TRUE,
       scrollY = 300,
+      scrollX = TRUE,
       scroller = TRUE,
       columnDefs = list(
-        list(
+        list(className = 'dt-center',
           visible = FALSE,
-          targets = c(3,3, 3:3)
+          targets = c(2,2, 2:2)
         )
-      ),
+      ), 
       buttons = list(
-        I("colvis"),
-        "csv"
-
+        I("colvis"),  
+        "csv" 
+        
       )))
 
 
@@ -898,35 +900,36 @@ base <- readRDS("base_obs.rds")%>%
 ### Data
 ```{r}
 stats=read_csv("data/data_mapa_trend_cb.csv")
-names(stats)=c("Código País","País","Hits", "Fuente")
+stats$geo <- NULL
+names(stats)=c("País","Hits", "Fuente")
 stats %>%
   DT::datatable(escape = FALSE,
-    filter = "top",
+    filter = "top", 
     extensions = c(
       "Buttons",
-      "Scroller"
+      "Scroller"  
     ),
-    rownames = FALSE,
+    rownames = FALSE,  
     style = "bootstrap",
     class = "compact",
     width = "100%",
     options = list(
-      dom = "Blrtip",
+      dom = "Blrtip",  
       deferRender = TRUE,
       scrollY = 300,
+      scrollX = TRUE,
       scroller = TRUE,
       columnDefs = list(
-        list(
+        list(className = 'dt-center',
           visible = FALSE,
-          targets = c(3,3, 3:3)
+          targets = c(2,2, 2:2)
         )
-      ),
+      ), 
       buttons = list(
-        I("colvis"),
-        "csv"
-
+        I("colvis"),  
+        "csv" 
+        
       )))
-
 
 ```
 
