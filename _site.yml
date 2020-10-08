@@ -1,12 +1,7 @@
 name: "Dashboard BID"
-output_dir: "."
 navbar:
   title: "Dashboard BID"
   left:
     - text: "Dashboard"
       href: index.html
 
-output:
-  html_document:
-    theme: cerulean
-    highlight: tango

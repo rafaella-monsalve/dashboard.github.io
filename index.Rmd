@@ -5,6 +5,7 @@ output:
     theme: cosmo
     orientation: columns
     vertical_layout: fill
+
  
 
   
@@ -114,14 +115,13 @@ mapa_base%>%
 
 ### Data 
 ```{r}
-stats=read_csv("data/data_mapa.csv")
-stats$PN20 <- NULL
-names(stats)=c("Código","País","Proporción de mujeres", "Fuente")
+stats=read_csv("data/data_mapa_vd.csv")
+names(stats)=c("País","Proporción de mujeres","Cantidad de Iniciativas","Fuente")
 stats %>%
   DT::datatable(escape = FALSE,
     filter = "top", 
     extensions = c(
-      "Buttons",  
+      "Buttons",
       "Scroller"  
     ),
     rownames = FALSE,  
@@ -132,9 +132,10 @@ stats %>%
       dom = "Blrtip",  
       deferRender = TRUE,
       scrollY = 300,
+      scrollX = TRUE,
       scroller = TRUE,
       columnDefs = list(
-        list(
+        list(className = 'dt-center',
           visible = FALSE,
           targets = c(3,3, 3:3)
         )
@@ -238,15 +239,30 @@ hchart(dato3, "treemap", hcaes(x = clave, value = valor
 
 ### Data 
 ```{r}
-stats=read_csv("data/Ini_vd.csv")
-stats$Link <- paste0("<a href='",stats$link,"'>",stats$link,"</a>")
-stats$link <- NULL
-names(stats)=c("Fecha","País","Nombre de Iniciativa", "Tipo de Iniciativa", "Descripción","Link")
+stats<- read_csv("data/Ini_Instituciones.csv")
+names(stats)[1]<- "geo"
+names(stats)[2]<- "pais"
+names(stats)[3]<- "sigla"
+names(stats)[4]<- "inst"
+names(stats)[5]<- "ini"
+names(stats)[6]<- "area"
+names(stats)[7]<- "tipo"
+names(stats)[8]<- "fecha"
+names(stats)[9]<- "fin"
+names(stats)[10]<- "desc"
+names(stats)[11]<- "link1"
+names(stats)[12]<- "link2"
+
+stats <- subset(stats, area== "Violencia Doméstica/VIF",
+                select = c("fecha","pais","ini", "fin", "desc", "link1") )
+stats$Link <- paste0("<a href='",stats$link1,"'>",stats$link1,"</a>")
+stats$link1 <- NULL
+names(stats)=c("Fecha","País","Nombre de Iniciativa", "Finalidad", "Descripción","Link")
 stats %>%
   DT::datatable(escape = FALSE,
     filter = "top", 
     extensions = c(
-      "Buttons",  
+      "Buttons",
       "Scroller"  
     ),
     rownames = FALSE,  
@@ -257,11 +273,12 @@ stats %>%
       dom = "Blrtip",  
       deferRender = TRUE,
       scrollY = 300,
+      scrollX = TRUE,
       scroller = TRUE,
       columnDefs = list(
-        list(
+        list(className = 'dt-center',
           visible = FALSE,
-          targets = c(2,3, 4:5)
+          targets = c(3,3, 3:3)
         )
       ), 
       buttons = list(
@@ -311,14 +328,13 @@ mapa_base%>%
 
 ### Data 
 ```{r}
-stats=read_csv("data/data_mapa.csv")
-stats$PM20 <- NULL
-names(stats)=c("Código","País","Proporción de Niños", "Fuente")
+stats=read_csv("data/data_mapa_cb.csv")
+names(stats)=c("País","Proporción de niños","Cantidad de Iniciativas","Fuente")
 stats %>%
   DT::datatable(escape = FALSE,
     filter = "top", 
     extensions = c(
-      "Buttons",  
+      "Buttons",
       "Scroller"  
     ),
     rownames = FALSE,  
@@ -329,9 +345,10 @@ stats %>%
       dom = "Blrtip",  
       deferRender = TRUE,
       scrollY = 300,
+      scrollX = TRUE,
       scroller = TRUE,
       columnDefs = list(
-        list(
+        list(className = 'dt-center',
           visible = FALSE,
           targets = c(3,3, 3:3)
         )
@@ -341,8 +358,6 @@ stats %>%
         "csv" 
         
       )))
-
-
 ```
 
 ##
@@ -421,15 +436,30 @@ hchart(dato3_cb, "treemap", hcaes(x = clave, value = valor
 
 ### Data 
 ```{r}
-stats=read_csv("data/Ini_cb.csv")
-stats$Link <- paste0("<a href='",stats$link,"'>",stats$link,"</a>")
-stats$link <- NULL
-names(stats)=c("Fecha","País","Nombre de Iniciativa", "Tipo de Iniciativa", "Descripción","Link")
+stats<- read_csv("data/Ini_Instituciones.csv")
+names(stats)[1]<- "geo"
+names(stats)[2]<- "pais"
+names(stats)[3]<- "sigla"
+names(stats)[4]<- "inst"
+names(stats)[5]<- "ini"
+names(stats)[6]<- "area"
+names(stats)[7]<- "tipo"
+names(stats)[8]<- "fecha"
+names(stats)[9]<- "fin"
+names(stats)[10]<- "desc"
+names(stats)[11]<- "link1"
+names(stats)[12]<- "link2"
+
+stats <- subset(stats, area== "ciberbullying" | area== "Ciberbullying",
+                select = c("fecha","pais","ini", "fin", "desc", "link1") )
+stats$Link <- paste0("<a href='",stats$link1,"'>",stats$link1,"</a>")
+stats$link1 <- NULL
+names(stats)=c("Fecha","País","Nombre de Iniciativa", "Finalidad", "Descripción","Link")
 stats %>%
   DT::datatable(escape = FALSE,
     filter = "top", 
     extensions = c(
-      "Buttons",  
+      "Buttons",
       "Scroller"  
     ),
     rownames = FALSE,  
@@ -440,11 +470,12 @@ stats %>%
       dom = "Blrtip",  
       deferRender = TRUE,
       scrollY = 300,
+      scrollX = TRUE,
       scroller = TRUE,
       columnDefs = list(
-        list(
+        list(className = 'dt-center',
           visible = FALSE,
-          targets = c(2,3, 4:5)
+          targets = c(3,3, 3:3)
         )
       ), 
       buttons = list(
@@ -452,8 +483,6 @@ stats %>%
         "csv" 
         
       )))
-
-
 ```
 
 

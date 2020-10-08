@@ -1,0 +1,13 @@
+name: biddashboard
+title:
+username:
+account: pueblac
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2964304
+bundleId: 3713584
+url: https://pueblac.shinyapps.io/biddashboard/
+when: 1602089142.94754
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .nojekyll|.RData|_site.yml|about.html|about.Rmd|base_obs.rds|bidgeo.dbf|bidgeo.prj|bidgeo.shp|bidgeo.shx|Dashboard.html|Dashboard.Rmd|data_mapa.csv|data_mapa_web.csv|index.html|index.Rmd|interest_tbl2.csv|interest_tbl20.rds|interest_tbl4.csv|pala_cb.csv|pala_vd.csv|palabras_cb.rds|palabras_vd.rds|prueba1.csv|README.md|Render.R|topics_tbl2.csv|topics_tbl20.rds|topics_tbl3.csv|Dashboard_files|data|index_files|site_libs
